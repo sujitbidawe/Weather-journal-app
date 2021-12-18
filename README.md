@@ -17,3 +17,6 @@ Technologies used for the project:
     
 
 How to run the project:
+
+    1. While in the main folder of the project -->  run: "node server"
+    2. open index.html file in the browser 
