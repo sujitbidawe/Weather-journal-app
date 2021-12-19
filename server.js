@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 // Setup empty JS object to act as endpoint for all routes
-const projectData = [{asd: 1}];
+const projectData = {};
 const port = 4600;
 
 // Start up an instance of app
@@ -29,13 +29,15 @@ function listening() {
     console.log(`running on localhost: ${port}`);
 };
 
-function addWeather(req, res) {
-    projectData.push(req.body);
-    res.status(200).send('data added');
+function addData(req, res) {
+    projectData['date'] = req.body.date;
+    projectData['temperature'] = req.body.temperature;
+    projectData['feelings'] = req.body.feelings;
+    res.send(projectData);
 };
 
 app.get('/all', function (req, res) {
     res.send(projectData);
 });
 
-app.post('/', addWeather);
+app.post('/', addData);

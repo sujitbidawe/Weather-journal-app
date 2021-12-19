@@ -1,6 +1,6 @@
 // Global Variables
-const weatherMapAPIPersonalKey = "8c7739e6678bc414db460b7f5a6c6c39";
-const weatherMapBaseURL = `http://api.openweathermap.org/data/2.5/weather?appid=${weatherMapAPIPersonalKey}`;
+const apiKey = "8c7739e6678bc414db460b7f5a6c6c39&units=imperial";
+const weatherMapBaseURL = `http://api.openweathermap.org/data/2.5/weather?appid=${apiKey}`;
 const backendUrl = "http://localhost:4600";
 // Global Variables End
 
@@ -16,7 +16,7 @@ function getZipCode(){
 // Function for generating current date
 function getDate(){
     let date = new Date();
-    let newDate = date.getMonth()+'/'+ date.getDate()+'/'+ date.getFullYear();
+    let newDate = date.getMonth() + 1 +'/'+ date.getDate()+'/'+ date.getFullYear();
     return newDate;
 }
 
@@ -56,11 +56,13 @@ function getWeatherFn(url='', zipCode='') {
         const data = {
             'temperature'   : weatherData.main.temp,
             'date'          : getDate(),
-            'user_response' : getUserFeelings().value
+            'feelings'      : getUserFeelings().value
         }
         return data;
     }).then(function (data={}) {
-        postDataToServer(backendUrl+'/', data);
+        postDataToServer(backendUrl+'/', data).then((data) => {
+            updateUI(data);
+        })
         return data;
     }).then(function (data={}) {
         getDataFromServer(backendUrl+'/all', data);
@@ -98,14 +100,17 @@ const getDataFromServer = async ( url = '', data = {}) => {
     try {
         const allData = await response.json();
         console.log(allData);
-        document.getElementById('date').innerText = allData[allData.length - 1].date;
-        document.getElementById('temp').innerText = allData[allData.length - 1].temperature;
-        document.getElementById('content').innerText = allData[allData.length - 1].user_response;
         return allData;
     } catch (error) {
         console.log("error", error);
     }
 };
+
+function updateUI(data) {
+    document.getElementById('date').innerHTML = data.date;
+    document.getElementById('temp').innerHTML = data.temperature;
+    document.getElementById('content').innerHTML = data.feelings;         
+}
 
 // Event listener for click button
 window.addEventListener('DOMContentLoaded', () => {
