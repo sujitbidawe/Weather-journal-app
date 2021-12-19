@@ -49,6 +49,9 @@ const getWeather = async (url= '', zipCode = '') => {
 
 // Function for fetching weather status
 function getWeatherFn(url='', zipCode='') {
+    if (!zipCode) {
+        return;
+    }
     getWeather(url, zipCode).then(function(weatherData={}) {
         const data = {
             'temperature'   : weatherData.main.temp,
