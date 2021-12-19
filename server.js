@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 // Setup empty JS object to act as endpoint for all routes
-const projectData = [];
+const projectData = [{asd: 1}];
 const port = 4600;
 
 // Start up an instance of app
@@ -31,6 +31,7 @@ function listening() {
 
 function addWeather(req, res) {
     projectData.push(req.body);
+    res.status(200).send('data added');
 };
 
 app.get('/all', function (req, res) {

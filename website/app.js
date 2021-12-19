@@ -28,6 +28,12 @@ function onlyNumbers($event){
     }
 }
 
+// Function for getting user feelings from UI
+function getUserFeelings() {
+    const feelings = document.getElementById('feelings');
+    return feelings || "";
+}
+
 // API call for fetching weather status
 const getWeather = async (url= '', zipCode = '') => {
     const weatherQueryUrl = `${url}&zip=${zipCode}`;
@@ -47,28 +53,15 @@ function getWeatherFn(url='', zipCode='') {
         const data = {
             'temperature'   : weatherData.main.temp,
             'date'          : getDate(),
-            'user_response' : getUserFeelings()
+            'user_response' : getUserFeelings().value
         }
         return data;
     }).then(function (data={}) {
         postDataToServer(backendUrl+'/', data);
         return data;
     }).then(function (data={}) {
-        displayDataOnUI(data.date, data.temperature, data.user_response);
+        getDataFromServer(backendUrl+'/all', data);
     });
-}
-
-// Function for getting user feelings from UI
-function getUserFeelings() {
-    const feelings = document.getElementById('feelings');
-    return feelings || "";
-}
-
-// Function for displaying data on UI
-function displayDataOnUI(date, temperature, content) {
-    document.getElementById('date').innerText = date;
-    document.getElementById('temp').innerText = temperature;
-    document.getElementById('content').innerText = content.value;
 }
 
 // Function to add weather data to server
@@ -83,30 +76,33 @@ const postDataToServer = async ( url = '', data = {}) => {
         body: JSON.stringify(data)
     });
     try {
-        const newData = await response.json();
+        const newData = await data;
         return newData;
     } catch (error) {
         console.log("error", error);
     }
 };
 
-// Function to fetch weather status from openWeatherMap
-function generatePostWeather(url='', zipCode='') {
-    getWeather(url, zipCode).then(function(weatherData={}) {
-        const data = {
-            'temperature'   : weatherData.main.temp,
-            'date'          : getCurrentDate(),
-            'user_response' : getUserResponse().value
+const getDataFromServer = async ( url = '', data = {}) => {
+    const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
         }
-        return data;
-    }).then(function (data={}) {
-        console.log(data);
-        postData(backendUrl+'/', data);
-        return data;
-    }).then(function (data={}) {
-        updateUI(data.date, data.temperature, data.user_response);
     });
-}
+    try {
+        const allData = await response.json();
+        console.log(allData);
+        document.getElementById('date').innerText = allData[allData.length - 1].date;
+        document.getElementById('temp').innerText = allData[allData.length - 1].temperature;
+        document.getElementById('content').innerText = allData[allData.length - 1].user_response;
+        return allData;
+    } catch (error) {
+        console.log("error", error);
+    }
+};
 
 // Event listener for click button
 window.addEventListener('DOMContentLoaded', () => {
